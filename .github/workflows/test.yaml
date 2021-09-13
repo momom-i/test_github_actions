@@ -1,0 +1,37 @@
+name: Create PR from master to develop branch
+on:
+  push:
+    branches:
+      - master
+jobs:
+  createPullRequest:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set env
+        run: echo "GH_BRANCH=merge-master/$(date '+%Y%m%d%H%M%S%3N')" >> $GITHUB_ENV
+      - name: Switch branch for merging
+        run: |
+           git checkout -b ${GH_BRANCH}
+           git push origin ${GH_BRANCH}
+      - name: Create Pull Request
+        if: "${{ contains(github.event.head_commit.message, 'CHANGELOG: bump version') }}"
+        id: create-pull-request
+        uses: repo-sync/pull-request@v2
+        with:
+          pr_title: "Sync develop with master"
+          pr_body: |
+            This is an auto-generated PR by *Create PR from master to develop branch* GitHub actions job.
+
+              ## WHAT
+
+              sync develop with master branch
+
+              ## WHY
+              
+              changelog is updated
+          pr_label: "sync with master,automated pr"
+          destination_branch: "develop"
+          source_branch: ${{ env.GH_BRANCH }}
