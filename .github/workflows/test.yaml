@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Set env
-        run: echo "GH_BRANCH=merge-master/$(date '+%Y%m%d%H%M%S%3N')" >> $GITHUB_ENV
+        run: echo "GH_BRANCH=merge-master/$(TZ=Asia/Tokyo date '+%Y%m%d%H%M%S%3N')" >> $GITHUB_ENV
       - name: Switch branch for merging
         run: |
            git checkout -b ${GH_BRANCH}
